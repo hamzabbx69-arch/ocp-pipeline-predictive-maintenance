@@ -1,7 +1,5 @@
-numpy
-pandas
-scikit-learn
 streamlit
-plotly
+pandas
+numpy
 plotly
 scikit-learn
