@@ -1,72 +1,47 @@
-# 🏭 OCP Jorf Lasfar — Pipeline Predictive Maintenance (Digital Twin)
+# OCP Pipeline Predictive Maintenance — Industrial Digital Twin
 
-📊 **Un Système de Pronostic et de Gestion de la Santé (PHM) hybride combinant la simulation CFD (OpenFOAM) et l'Intelligence Artificielle (Machine Learning) pour prédire l'érosion des conduites de phosphate.**
-
----
-
-## 🚀 Aperçu du Projet
-
-Dans les installations industrielles de l'**OCP Jorf Lasfar**, le transport de la pulpe de phosphate à travers les pipelines provoque une érosion sévère par impact particulaire, en particulier au niveau des coudes de tuyauterie. 
-
-Ce projet implémente un **Jumeau Numérique (Digital Twin)** capable de :
-1. Établir une baseline hydrodynamique via une simulation CFD.
-2. Générer un dataset de dégradation basé sur des lois d'usure physiques.
-3. Entraîner un modèle de Machine Learning pour prédire le **RUL (Remaining Useful Life)**.
-4. Fournir une **Interface HMI/SCADA Interactive** pour assister les opérateurs dans la prise de décision.
+An industrial-grade Digital Twin framework designed for OCP Jorf Lasfar, combining Computational Fluid Dynamics (CFD) simulation data with Predictive Analytics to monitor pipeline health, predict cloggings, and prevent pressure-induced failures in real-time.
 
 ---
 
-## 🛠️ Technologies Utilisées
+## Overview
+Industrial pipelines transporting slurry undergo severe stress, leading to degradation, micro-cloggings, or catastrophic pressure drops. This project establishes a bridge between physical fluid simulations and AI by leveraging OpenFOAM data to train high-fidelity Machine Learning Models, all served through an interactive, production-ready Streamlit Dashboard.
 
-* **Simulation Numérique :** OpenFOAM (v2406) — Résolution des équations de Navier-Stokes pour obtenir la perte de charge (Delta P).
-* **Langage & Data Science :** Python 3.12, Pandas, NumPy.
-* **Machine Learning :** Scikit-Learn (Random Forest Regressor).
-* **Interface Graphique :** Streamlit Framework (UI/UX Industrielle Premium).
-
----
-
-## 📐 Architecture du Pipeline (Data Flow)
-
-```
-[ OpenFOAM CFD ] ──> Extraction de la Baseline (Delta P) ──> [ 1500 Data Points ]
-                                                               │
-                                                               ▼
-[ Streamlit UI ] <── Prédiction en Temps Réel <── [ Modèle Random Forest ]
-```
+### Key Features
+- CFD-to-ML Data Pipeline: Integrates fluid dynamics parameters from OpenFOAM solver sequences.
+- Predictive Health Monitoring (PHM): Real-time anomaly detection (Healthy vs. Degraded vs. Critical).
+- Industrial SCADA-like UI: A modern dashboard mimicking control-room monitoring systems.
 
 ---
 
-## 🎯 Performances du Modèle d'IA
-
-Le modèle de régression basé sur l'algorithme **Random Forest** a été entraîné après une phase de *Feature Engineering* (calcul de moyennes mobiles et de gradients de pression). Les résultats obtenus sont extrêmement précis :
-
-* **R2 Score (Précision globale) :** 99.57 %
-* **Mean Absolute Error (MAE) :** 2.624 Jours
-
-> ℹ️ **Impact Industriel :** Une erreur moyenne de seulement ~2.6 jours sur un cycle d'usure de 180 jours permet une planification chirurgicale des arrêts techniques à Jorf Lasfar, évitant ainsi les pannes catastrophiques en pleine production.
+## Architecture & Data Flow
+1. Physics Layer (OpenFOAM): Simulates multi-phase flow behaviors across distinct operational configurations.
+2. Analytics Layer (Python & ML): Evaluates structural anomalies against a strict physical baseline (healthy_baseline.csv).
+3. Visualization Layer (Streamlit): Translates model probabilities into clear risk heatmaps and sensor trends.
 
 ---
 
-## 📦 Installation et Utilisation
+## Repository Structure
+- app.py : Streamlit Dashboard Core Application
+- ml_predictive_maintenance.py : ML Model Training & Evaluation Logic
+- analyze_maintenance.py : Feature Engineering & Delta Analysis
+- healthy_baseline.csv : Nominal reference state metrics
+- requirements.txt : Python dependencies
+- README.md : Project Documentation
 
-### 1. Clonage du Projet
-```bash
-git clone https://github.com/votre-username/ocp-pipeline-predictive-maintenance.git
-cd ocp-pipeline-predictive-maintenance
-```
+---
 
-### 2. Installation des Dépendances
-```bash
-pip3 install -r requirements.txt
-```
+## Quick Start & Deployment
 
-### 3. Génération des Données et Entraînement
-```bash
-python3 src/ml_predictive_maintenance.py
-```
+1. Installation:
+   git clone https://github.com/hamzabbx69-arch/ocp-pipeline-predictive-maintenance.git
+   cd ocp-pipeline-predictive-maintenance
+   pip3 install -r requirements.txt
 
-### 4. Lancement du Dashboard Interactif
-```bash
-python3 -m streamlit run src/app.py
-```
-Ouvrez ensuite votre navigateur sur `http://localhost:8501` pour interagir avec le Jumeau Numérique.
+2. Running the Digital Twin Dashboard:
+   python3 -m streamlit run app.py
+
+Open your browser and navigate to http://localhost:8502 to interact with the interface.
+
+---
+*Developed as part of an Engineering Initiative for industrial asset optimization.*
