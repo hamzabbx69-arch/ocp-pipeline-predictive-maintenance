@@ -1,25 +1,22 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-from ml_predictive_maintenance import predict_anomaly, calculate_rul
+from ml_predictive_maintenance import predict_anomaly
 
-st.set_page_config(page_title="OCP Digital Twin", layout="wide")
-st.title("🏭 OCP Jorf Lasfar — Pipeline Predictive Maintenance")
+st.title("OCP Digital Twin")
 
 # تحميل الداتا
 df = pd.read_csv("industrial_predictive_maintenance_data.csv")
 
-# --- Debugging: هاد السطر غيورينا سميات الأعمدة فـ الباج د السيت ---
-st.write("### Debug: Colonnes trouvées dans le CSV:")
-st.write(df.columns.tolist())
+# عرض أول 3 أعمدة (بلاصت ما نكتبو السميات)
+idx = st.slider("Étape", 0, len(df)-1, 0)
+row = df.iloc[idx]
 
-# نختارو صف واحد بـ index (بلا ما نعتامدو على 'time_step')
-st.sidebar.header("🎛️ Contrôle")
-idx = st.sidebar.slider("Sélectionner l'étape", min_value=0, max_value=len(df)-1, value=0)
-current_data = df.iloc[idx]
+# العرض (بإستعمال الأرقام ديال الأعمدة 0, 1, 2)
+st.metric("Pin", f"{row[0]:.2f} bar")
+st.metric("Pout", f"{row[1]:.2f} bar")
+st.metric("VTSS", f"{row[2]:.2f} m/s")
 
-# العرض (بـ إستعمال الأسامي اللي غتخرج لينا ف الـ Debug)
-# إذا طلع ليك خطأ هنا، يعني السمية ف الـ CSV فيها شي فراغ أو ختلاف
-st.write("Données de la ligne sélectionnée:")
-st.write(current_data)
+# الموديل
+status, _ = predict_anomaly(np.array([[row[0], row[1], row[2]]]))
+st.write(f"### État: {status}")
