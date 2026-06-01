@@ -1,14 +1,12 @@
-import numpy as np
-
-# --- هادو هما الـ Functions اللي محتاجهم app.py ---
-def predict_anomaly(input_features):
-    # هنا كدير الـ Logic ديال الـ ML ديالك
-    return "Healthy", 0.95
-
 def calculate_rul(delta_p):
-    # هنا كدير الـ Logic ديال الـ RUL
-    return 100
+    # Logique simple pour le calcul de la RUL
+    return max(0, 200 - int(delta_p * 10))
 
-# --- وهنا كيبقى الـ Simulation ديالك اللي ديجا صاوبتي ---
-baseline_dp = 4.597485
-# (باقي الكود ديالك كيبقى هنا...)
+def predict_anomaly(delta_p, rolling_mean):
+    # Version corrigée acceptant 2 arguments
+    if delta_p > 10:
+        return "Critical", 0.99
+    elif delta_p > 7:
+        return "Warning", 0.85
+    else:
+        return "Healthy", 0.95
