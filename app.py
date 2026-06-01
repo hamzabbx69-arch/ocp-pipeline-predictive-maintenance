@@ -1,47 +1,58 @@
 import streamlit as st
 import pandas as pd
-from ml_predictive_maintenance import predict_anomaly, calculate_rul
 
+# Configuration page
 st.set_page_config(page_title="OCP Digital Twin", layout="wide")
 
-# Titre avec style professionnel
-st.markdown("""
-    <h1 style='text-align: center; color: #2e7d32;'>🏭 OCP Jorf Lasfar — Digital Twin & PHM</h1>
-    <hr>
-""", unsafe_allow_html=True)
+# Titre professionnel
+st.markdown("<h1 style='text-align: center;'>🏭 OCP Jorf Lasfar — Maintenance Prédictive</h1>", unsafe_allow_html=True)
 
+# Chargement données
 df = pd.read_csv("industrial_predictive_maintenance_data.csv")
 
-# Sidebar stylée
-st.sidebar.header("🛠 Configuration")
-idx = st.sidebar.slider("Perte de Charge (Delta P)", 0, len(df)-1, 0)
+# Sidebar
+st.sidebar.header("Configuration")
+idx = st.sidebar.slider("Étape (Simulation)", 0, len(df)-1, 0)
 row = df.iloc[idx]
 
-# Calculs
+# Valeurs réelles de ton fichier
 delta_p = row['delta_p']
-rul = calculate_rul(delta_p)
-status, _ = predict_anomaly(delta_p, row['delta_p_rolling_mean'])
+rolling_mean = row['delta_p_rolling_mean']
+gradient = row['delta_p_gradient']
+rul = row['RUL_days']
 
-# Bloc des métriques (Ligne du haut)
+# Logique de couleur dynamique
+if delta_p > 8:
+    color = "red"
+    status = "CRITICAL - MAINTENANCE REQUISE"
+elif delta_p > 6.5:
+    color = "orange"
+    status = "WARNING - SURVEILLANCE"
+else:
+    color = "green"
+    status = "HEALTHY - NOMINAL"
+
+# Affichage métriques avec couleurs
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Réf. Baseline", "4.60 bar")
-col2.metric("Delta P Actuel", f"{delta_p:.2f} bar")
-col3.metric("Surpression", "0.00 bar")
-col4.metric("Précision IA", "99.57 %")
+col1.metric("Delta P", f"{delta_p:.2f} bar")
+col2.metric("Rolling Mean", f"{rolling_mean:.2f}")
+col3.metric("Gradient", f"{gradient:.4f}")
+col4.metric("RUL", f"{rul} Jours")
 
-st.markdown("<br>", unsafe_allow_html=True)
+# Affichage état stylisé
+st.markdown(f"""
+<div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; border-left: 10px solid {color};">
+    <h2 style="color: {color};">État actuel : {status}</h2>
+</div>
+""", unsafe_allow_html=True)
 
-# Bloc Diagnostic structuré
-with st.container():
-    st.subheader("🧠 Diagnostic de l'État & Décision")
-    c_diag1, c_diag2 = st.columns(2)
-    c_diag1.success(f"🟢 État: {status}")
-    c_diag2.info(f"📅 RUL Estimée: {rul} Jours")
+st.divider()
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# Analyse Temporelle (Les graphiques)
-st.subheader("📈 Analyse Temporelle (Données Historiques)")
-g1, g2 = st.columns(2)
-g1.line_chart(df['delta_p'])
-g2.line_chart(df['RUL_days'])
+# Graphiques
+c1, c2 = st.columns(2)
+with c1:
+    st.subheader("Évolution du Delta P")
+    st.line_chart(df['delta_p'])
+with c2:
+    st.subheader("Évolution du RUL (Jours)")
+    st.line_chart(df['RUL_days'])
