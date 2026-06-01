@@ -2,57 +2,58 @@ import streamlit as st
 import pandas as pd
 
 # Configuration page
-st.set_page_config(page_title="OCP Digital Twin", layout="wide")
+st.set_page_config(page_title="OCP Dashboard Pro", layout="wide")
 
-# Titre professionnel
-st.markdown("<h1 style='text-align: center;'>🏭 OCP Jorf Lasfar — Maintenance Prédictive</h1>", unsafe_allow_html=True)
+# Header Industriel
+st.markdown("""
+    <div style="background-color: #0f172a; padding: 25px; border-radius: 10px; color: white;">
+        <h1 style="margin: 0;">🏭 OCP JORF LASFAR — DIGITAL TWIN & PHM</h1>
+        <p style="margin: 0; opacity: 0.8;">Système de Pronostic et de Gestion de la Santé du Pipeline</p>
+    </div>
+    <br>
+""", unsafe_allow_html=True)
 
 # Chargement données
 df = pd.read_csv("industrial_predictive_maintenance_data.csv")
 
 # Sidebar
-st.sidebar.header("Configuration")
-idx = st.sidebar.slider("Étape (Simulation)", 0, len(df)-1, 0)
+st.sidebar.header("🛠 Configuration SCADA")
+idx = st.sidebar.slider("Simulation Pression (Delta P)", 0, len(df)-1, 0)
 row = df.iloc[idx]
 
-# Valeurs réelles de ton fichier
+# Données
 delta_p = row['delta_p']
+rul = row['RUL_days']
 rolling_mean = row['delta_p_rolling_mean']
 gradient = row['delta_p_gradient']
-rul = row['RUL_days']
 
-# Logique de couleur dynamique
+# KPIs
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Delta P Actuel", f"{delta_p:.2f} bar")
+c2.metric("RUL Estimée", f"{int(rul)} Jours")
+c3.metric("Rolling Mean", f"{rolling_mean:.2f}")
+c4.metric("Gradient", f"{gradient:.4f}")
+
+# Diagnostic Dynamique
 if delta_p > 8:
-    color = "red"
-    status = "CRITICAL - MAINTENANCE REQUISE"
+    color, status = "#ef4444", "CRITICAL - MAINTENANCE IMMÉDIATE"
 elif delta_p > 6.5:
-    color = "orange"
-    status = "WARNING - SURVEILLANCE"
+    color, status = "#f59e0b", "WARNING - SURVEILLANCE REQUISE"
 else:
-    color = "green"
-    status = "HEALTHY - NOMINAL"
+    color, status = "#22c55e", "HEALTHY - ÉTAT NOMINAL"
 
-# Affichage métriques avec couleurs
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Delta P", f"{delta_p:.2f} bar")
-col2.metric("Rolling Mean", f"{rolling_mean:.2f}")
-col3.metric("Gradient", f"{gradient:.4f}")
-col4.metric("RUL", f"{rul} Jours")
-
-# Affichage état stylisé
 st.markdown(f"""
-<div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; border-left: 10px solid {color};">
-    <h2 style="color: {color};">État actuel : {status}</h2>
-</div>
+    <div style="background-color: {color}; padding: 15px; border-radius: 8px; color: white; text-align: center;">
+        <h2 style="margin:0;">STATUT SYSTÈME : {status}</h2>
+    </div>
 """, unsafe_allow_html=True)
 
-st.divider()
-
-# Graphiques
-c1, c2 = st.columns(2)
-with c1:
-    st.subheader("Évolution du Delta P")
+# Analyse
+st.markdown("<br><h3>📈 Analyse Temporelle</h3>", unsafe_allow_html=True)
+g1, g2 = st.columns(2)
+with g1:
+    st.subheader("Courbe de Pression (Delta P)")
     st.line_chart(df['delta_p'])
-with c2:
-    st.subheader("Évolution du RUL (Jours)")
+with g2:
+    st.subheader("Prédiction Vie Utile (RUL)")
     st.line_chart(df['RUL_days'])
